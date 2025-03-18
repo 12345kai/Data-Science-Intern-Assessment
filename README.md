@@ -105,52 +105,140 @@ except Exception as e:
     return f"Error generating insights: {str(e)}"
 ```
 
-## Prompt Engineering Techniques
 
-Several prompt engineering techniques are used to optimize AI responses:
+## Detailed Prompt Engineering Strategies
 
-### 1. Role Prompting
+The effectiveness of the AI components in the Property Clustering Dashboard relies heavily on sophisticated prompt engineering techniques. Here's a deeper look at the approaches implemented:
+
+### 1. Domain-Specific Role Setting
 
 ```python
 "You are a real estate analytics expert specializing in property clustering and lease-up analysis."
 ```
-This establishes domain expertise for the model, improving the relevance and depth of responses.
 
-### 2. Structured Data Presentation
+This role definition does more than just establish domain knowledge - it activates specific reasoning patterns in the model:
 
-```python
-Cluster statistics:
-{cluster_stats}
-```
-Presenting structured data in a standardized format helps the model interpret numerical information correctly.
+- **Industry-Specific Vocabulary**: Primes the model to use terms like "lease-up time," "concessions," and "absorption rates" appropriately
+- **Analytical Mindset**: Encourages quantitative reasoning and statistical interpretation
+- **Professional Tone**: Creates output that matches the expectations of real estate professionals
 
-### 3. Specific Output Formatting Guidelines
+The role definition functions as a cognitive frame that shapes all subsequent reasoning.
 
-```python
-Format your response with markdown headings and bullet points for clarity.
-```
-This ensures consistent, readable responses that integrate well with the Streamlit interface.
+### 2. Data Contextualization
 
-### 4. Task Decomposition
-
-The prompt breaks down the task into specific components:
-- Understanding cluster statistics
-- Addressing the user's query
-- Identifying patterns
-- Providing actionable insights
-
-### 5. Temperature Control
+The prompt carefully contextualizes data before asking for analysis:
 
 ```python
-temperature=0.5
+cluster_stats = clustered_df.groupby('Cluster').agg({
+    'Lease_Up_Time': 'mean',
+    'Average_Rent_During_LeaseUp': 'mean',
+    'Effective_Age': 'mean',
+    'Quantity': 'mean',
+    'AreaPerUnit': 'mean',
+    'Average_Concession_During_LeaseUp': 'mean'
+}).round(2).to_string()
 ```
-A moderate temperature (0.5) balances creativity with factual accuracy - critical for data analysis tasks.
 
-## Implementation Considerations
+This approach:
+- Provides statistical summaries rather than raw data
+- Pre-aggregates information at the appropriate level of analysis
+- Formats numbers for readability (using rounding)
+- Orders variables to emphasize the target variable (Lease_Up_Time first)
 
-1. **Fallback System**: The dual approach allows the dashboard to function even without an API key
-2. **Security**: API keys are treated as passwords and never stored in session
-3. **Response Quality Control**: Parameters like temperature and max_tokens are tuned for optimal responses
-4. **Error Handling**: Comprehensive error catching with informative messages
+The format of data presentation significantly impacts how the model interprets relationships between variables.
 
-This hybrid approach creates a robust, user-friendly interface for exploring property clustering results using natural language.
+### 3. Directional Instruction Strategy
+
+The prompt uses specific directives to guide the analysis:
+
+```python
+"Focus on lease-up time patterns, relationships between variables, and actionable insights."
+```
+
+This three-part instruction creates a structured analytical framework:
+- **Pattern identification**: Detecting trends in the primary metric
+- **Relationship analysis**: Exploring correlations and dependencies
+- **Action orientation**: Translating findings into practical recommendations
+
+The sequencing is intentional, creating a logical flow from observation to insight to action.
+
+### 4. Multi-layered Query Processing
+
+The template system employs a sophisticated query parsing approach:
+
+```python
+# Pattern matching for specific query types
+if "overview" in query or "summary" in query or "general" in query:
+    return self._generate_overview(stats)
+elif any(term in query for term in ["fast", "quick", "speed", "fastest"]):
+    return self._generate_lease_up_speed_insight(stats)
+```
+
+This strategy:
+- Identifies user intent through keyword analysis
+- Maps intents to specialized processing functions
+- Handles linguistic variations (synonyms like "fast" and "quick")
+- Provides fallback mechanisms for ambiguous queries
+
+The tiered approach allows for highly specific responses to common queries while maintaining flexibility.
+
+### 5. Response Scaffolding
+
+Both the template system and API prompts use markdown formatting instructions:
+
+```python
+"Format your response with markdown headings and bullet points for clarity."
+```
+
+This technique:
+- Creates consistent information hierarchy
+- Improves visual scanning of responses
+- Standardizes output format across different query types
+- Ensures compatibility with Streamlit's markdown renderer
+
+The structured output design makes complex analytical insights more accessible.
+
+### 6. Parameter Optimization
+
+The API calls use carefully calibrated parameters:
+
+```python
+temperature=0.5,
+max_tokens=800
+```
+
+These settings represent a deliberate balance:
+- **Temperature**: 0.5 is high enough for creative expression but low enough for factual consistency
+- **Max tokens**: 800 allows for comprehensive but focused responses without unnecessary verbosity
+
+These parameters were tuned through iterative testing to optimize response quality.
+
+### 7. Fallback Response Design
+
+The system implements sophisticated error handling with informative fallbacks:
+
+```python
+try:
+    # API call logic
+except Exception as e:
+    return f"Error generating insights: {str(e)}"
+```
+
+This approach:
+- Captures specific error types from the API
+- Provides transparent error reporting
+- Maintains user experience continuity
+- Falls back to template-based insights when API is unavailable
+
+The graceful degradation strategy ensures the dashboard remains functional under various conditions.
+
+## Implementation Impact
+
+These prompt engineering techniques have significant impacts on the dashboard's effectiveness:
+
+1. **Response Quality**: Clear, structured insights directly tied to the data
+2. **Customization**: Tailored analysis based on specific user queries
+3. **Consistency**: Predictable response patterns across different query types
+4. **Accessibility**: Complex statistical insights presented in understandable language
+
+The integration of these techniques creates a natural language interface that bridges the gap between complex clustering algorithms and actionable real estate insights, providing significant value to both technical and non-technical stakeholders.
