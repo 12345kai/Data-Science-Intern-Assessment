@@ -86,7 +86,7 @@ Format your response with markdown headings and bullet points for clarity.
 """
 ```
 
-### 2. API Call with Error Handling
+### 2. API Call with Error Handling (Due to privacy reasons, you need to provide your own ChatGPT API key to use this feature. This ensures that your data remains secure and that we don't store any API credentials on our servers. The API integration allows for advanced property analysis insights while maintaining the confidentiality of your real estate data. Simply enter your OpenAI API key in the settings section to unlock the full capabilities of our AI-powered analytics dashboard.)
 
 ```python
 try:
